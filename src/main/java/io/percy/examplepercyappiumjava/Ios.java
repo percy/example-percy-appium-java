@@ -22,8 +22,8 @@ public class Ios {
     public static void main(String[] args) throws MalformedURLException {
         DesiredCapabilities capabilities = new DesiredCapabilities();
         // Browserstack specific capabiilities
-        capabilities.setCapability("browserstack.user", "<USER>");
-        capabilities.setCapability("browserstack.key", "<USER_AUTH_KEY>");
+        capabilities.setCapability("browserstack.user", "ankur_R1bu6L");
+        capabilities.setCapability("browserstack.key", "E71yVFke8JVdEyg1cVnT");
         capabilities.setCapability("browserstack.appium_version", "1.20.2");
 
         // Percy Options
@@ -31,7 +31,7 @@ public class Ios {
         capabilities.setCapability("percy.ignoreErrors", "true");
 
         // App url we get post uploading in response
-        capabilities.setCapability("app", "<APP_URL>");
+        capabilities.setCapability("app", "bs://6d874ee2761068a3b64c4ee31668d26c4ba63f21");
         capabilities.setCapability("device", "iPhone 14");
         capabilities.setCapability("os_version", "16");
         capabilities.setCapability("project", "First Java Project");
@@ -53,7 +53,7 @@ public class Ios {
         // Find textInput and send some data to it
         IOSElement textInput = (IOSElement) new WebDriverWait(driver, 30).until(
             ExpectedConditions.elementToBeClickable(MobileBy.AccessibilityId("Text Input")));
-        textInput.sendKeys("hello@percy.io\n");
+        textInput.sendKeys("email@browserstack.com\n");
 
         // Take Second Screenshot Post screen update
         percy.screenshot("Second Screenshot");
