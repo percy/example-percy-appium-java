@@ -36,7 +36,7 @@ You can upload them using following curl command
 $ cd src/main/java/io/percy/resources
 $ curl -u "<username>:<access key>" \
   -X POST "https://api-cloud.browserstack.com/app-automate/upload" \
-  -F "file=@BStackSampleApp.ipa" # for iOS, for android use WikipediaSample.apk  
+  -F "file=@IosApp.ipa" # for iOS, for android use AndroidApp.apk  
 # You will get output similar to following, keep track of this app url
 {"app_url":"bs://b3d22f77ac5c4064bc1892f1c470d3728a9b697f"}
 ```
