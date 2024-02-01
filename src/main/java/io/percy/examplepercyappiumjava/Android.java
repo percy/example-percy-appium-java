@@ -16,7 +16,6 @@ import io.appium.java_client.android.AndroidElement;
 import io.percy.appium.AppPercy;
 
 public class Android {
-    private static AppPercy percy;
 
     // Hub Url to connect to Automation session
     private static String HUB_URL = "https://hub.browserstack.com/wd/hub";
@@ -42,7 +41,7 @@ public class Android {
         AndroidDriver<AndroidElement> driver = new AndroidDriver<AndroidElement>(new URL(HUB_URL), capabilities);
 
         // Initialize AppPercy
-        percy = new AppPercy(driver);
+        AppPercy percy = new AppPercy(driver);
 
         try {
             TimeUnit.SECONDS.sleep(5);
@@ -52,13 +51,12 @@ public class Android {
         // Take First Screenshot
         percy.screenshot("First Screenshot");
 
-
         AndroidElement searchElement = (AndroidElement) new WebDriverWait(driver, 30).until(
-            ExpectedConditions.elementToBeClickable(MobileBy.AccessibilityId("Search Wikipedia")));
+                ExpectedConditions.elementToBeClickable(MobileBy.AccessibilityId("Search Wikipedia")));
         searchElement.click();
 
         AndroidElement textInput = (AndroidElement) new WebDriverWait(driver, 30).until(
-            ExpectedConditions.elementToBeClickable(MobileBy.id("org.wikipedia.alpha:id/search_src_text")));
+                ExpectedConditions.elementToBeClickable(MobileBy.id("org.wikipedia.alpha:id/search_src_text")));
         textInput.sendKeys("Browserstack\n");
 
         try {
