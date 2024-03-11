@@ -21,11 +21,18 @@ public class Android {
     // Hub Url to connect to Automation session
     private static String HUB_URL = "https://hub.browserstack.com/wd/hub";
 
+    public String USERNAME = System.getenv("BROWSERSTACK_USERNAME");
+    public String AUTOMATE_KEY =  System.getenv("BROWSERSTACK_ACCESS_KEY");
+    public String APP_URL=  System.getenv("APP_URL");
+
     public static void main(String[] args) throws MalformedURLException {
+        String USERNAME = System.getenv("BROWSERSTACK_USERNAME");
+        String AUTOMATE_KEY =  System.getenv("BROWSERSTACK_ACCESS_KEY");
+        String APP_URL=  System.getenv("APP_URL");
         DesiredCapabilities capabilities = new DesiredCapabilities();
         // Browserstack specific capabiilities
-        capabilities.setCapability("browserstack.user", "<USER>");
-        capabilities.setCapability("browserstack.key", "<USER_AUTH_KEY>");
+        capabilities.setCapability("browserstack.user", USERNAME);
+        capabilities.setCapability("browserstack.key", AUTOMATE_KEY);
         capabilities.setCapability("browserstack.appium_version", "1.20.2");
 
         // Percy Options
@@ -33,7 +40,7 @@ public class Android {
         capabilities.setCapability("percy.ignoreErrors", "true");
 
         // App url we get post uploading in response
-        capabilities.setCapability("app", "<APP_URL>");
+        capabilities.setCapability("app", APP_URL);
         capabilities.setCapability("device", "Google Pixel 3");
         capabilities.setCapability("os_version", "9.0");
         capabilities.setCapability("project", "First Java Project");
