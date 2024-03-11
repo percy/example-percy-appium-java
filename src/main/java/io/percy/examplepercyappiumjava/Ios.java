@@ -20,10 +20,13 @@ public class Ios {
     private static String HUB_URL = "https://hub.browserstack.com/wd/hub";
 
     public static void main(String[] args) throws MalformedURLException {
+        String USERNAME = System.getenv("BROWSERSTACK_USERNAME");
+        String AUTOMATE_KEY =  System.getenv("BROWSERSTACK_ACCESS_KEY");
+        String APP_URL=  System.getenv("APP_URL");
         DesiredCapabilities capabilities = new DesiredCapabilities();
         // Browserstack specific capabiilities
-        capabilities.setCapability("browserstack.user", "<USER>");
-        capabilities.setCapability("browserstack.key", "<USER_AUTH_KEY>");
+        capabilities.setCapability("browserstack.user", USERNAME);
+        capabilities.setCapability("browserstack.key", AUTOMATE_KEY);
         capabilities.setCapability("browserstack.appium_version", "1.20.2");
 
         // Percy Options
@@ -31,7 +34,7 @@ public class Ios {
         capabilities.setCapability("percy.ignoreErrors", "true");
 
         // App url we get post uploading in response
-        capabilities.setCapability("app", "<APP_URL>");
+        capabilities.setCapability("app", APP_URL);
         capabilities.setCapability("device", "iPhone 14");
         capabilities.setCapability("os_version", "16");
         capabilities.setCapability("project", "First Java Project");
