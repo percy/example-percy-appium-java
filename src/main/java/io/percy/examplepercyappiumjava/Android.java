@@ -41,8 +41,8 @@ public class Android {
 
         // App url we get post uploading in response
         capabilities.setCapability("app", APP_URL);
-        capabilities.setCapability("device", "Google Pixel 3");
-        capabilities.setCapability("os_version", "9.0");
+        capabilities.setCapability("device", "Samsung Galaxy S21");
+        capabilities.setCapability("os_version", "11.0");
         capabilities.setCapability("project", "First Java Project");
 
         // Create sessioin

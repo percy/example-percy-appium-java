@@ -35,8 +35,8 @@ public class Ios {
 
         // App url we get post uploading in response
         capabilities.setCapability("app", APP_URL);
-        capabilities.setCapability("device", "iPhone 14");
-        capabilities.setCapability("os_version", "16");
+        capabilities.setCapability("device", "iPhone 12");
+        capabilities.setCapability("os_version", "14");
         capabilities.setCapability("project", "First Java Project");
 
         // Create sessioin
