@@ -14,7 +14,6 @@ import io.appium.java_client.ios.IOSElement;
 import io.percy.appium.AppPercy;
 
 public class Ios {
-    private static AppPercy percy;
 
     // Hub Url to connect to Automation session
     private static String HUB_URL = "https://hub.browserstack.com/wd/hub";
@@ -40,19 +39,19 @@ public class Ios {
         IOSDriver<IOSElement> driver = new IOSDriver<IOSElement>(new URL(HUB_URL), capabilities);
 
         // Initialize AppPercy
-        percy = new AppPercy(driver);
+        AppPercy percy = new AppPercy(driver);
 
         // Take First Screenshot
         percy.screenshot("First Screenshot");
 
         // Find element and click to change screen
         IOSElement textButton = (IOSElement) new WebDriverWait(driver, 30).until(
-            ExpectedConditions.elementToBeClickable(MobileBy.AccessibilityId("Text Button")));
+                ExpectedConditions.elementToBeClickable(MobileBy.AccessibilityId("Text Button")));
         textButton.click();
 
         // Find textInput and send some data to it
         IOSElement textInput = (IOSElement) new WebDriverWait(driver, 30).until(
-            ExpectedConditions.elementToBeClickable(MobileBy.AccessibilityId("Text Input")));
+                ExpectedConditions.elementToBeClickable(MobileBy.AccessibilityId("Text Input")));
         textInput.sendKeys("hello@percy.io\n");
 
         // Take Second Screenshot Post screen update
