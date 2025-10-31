@@ -18,5 +18,8 @@ serve:
 test-android: install
 	$(NPM)/percy app:exec --  mvn compile exec:java -Dexec.mainClass="io.percy.examplepercyappiumjava.Android"
 
+test-android-espresso: install
+	$(NPM)/percy app:exec --  mvn compile exec:java -Dexec.mainClass="io.percy.examplepercyappiumjava.AndroidEspresso"
+
 test-ios: install
 	$(NPM)/percy app:exec --  mvn compile exec:java -Dexec.mainClass="io.percy.examplepercyappiumjava.Ios"
