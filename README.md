@@ -41,6 +41,17 @@ $ curl -u "<username>:<access key>" \
 {"app_url":"bs://b3d22f77ac5c4064bc1892f1c470d3728a9b697f"}
 ```
 
+Example Android Espresso Driver server url is provided in [`resources/`](https://github.com/percy/example-percy-appium-js/blob/master/resources) folder.
+It is supported in percy-appium-java version >= `2.2.1`
+You can upload them using following command
+```bash
+$ cd src/main/java/io/percy/resources
+$ curl -u "YOUR_USERNAME:YOUR_ACCESS_KEY" \
+ -X POST "https://api-cloud.browserstack.com/app-automate/espresso-server" \
+ -F "file=@appium.espressoserver.wikipedia.apk"
+# You will get output similar to following, keep track of this app url
+{"espresso_server_url":"bs://b3d22f77ac5c4064bc1892f1c470d3728a9b697f"}
+```
 You can also follow [`upload your app`](https://www.browserstack.com/docs/app-automate/appium/getting-started/java#2-upload-your-app) if using App Automate for latest instructions.
 
 ### Step 2
@@ -89,6 +100,8 @@ Now run the build with following commands
 $ make test-android
 # For iOS
 $ make test-ios
+# For Android Appium Espresso Driver
+$ make test-android-espresso
 ```
 
 This will run the app's Java Appium tests, which contain calls to create Percy screenshots. The screenshots
@@ -129,6 +142,8 @@ Run the tests with screenshots again:
 $ make test-android
 # For iOS
 $ make test-ios
+# For Android Appium Espresso Driver
+$ make test-android-espresso
 ```
 
 This will run the tests again and take new screenshots of our modified application. The new screenshots
