@@ -1,0 +1,7 @@
+# PER-8195 — global config for the io.percy:percy-appium-app advanced
+# example. Per-screenshot options in AdvancedTest.java override these.
+
+version: 2
+
+percy:
+  defer_uploads: false

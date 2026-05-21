@@ -1,6 +1,15 @@
 # example-percy-appium-java
 Example app used by the [Percy Java Appium tutorial](https://docs.percy.io/v2-app/docs/appium-for-java) demonstrating Percy's Java Appium integration.
 
+> **New:** This repo ships an [`advanced/`](./advanced) example covering the full applicable App Percy SDK feature surface for `io.percy:percy-appium-app`. See the [Percy SDK Feature Matrix](https://docs.percy.io/docs/sdk-feature-matrix) for cross-SDK coverage.
+
+## Examples
+
+| Example | What it shows | Run command |
+|---|---|---|
+| `./` (basic, at repo root) | Minimum viable: `percy.screenshot(name)` plus Android / iOS / Espresso typed flows. Start here. | `make test-android` |
+| [`./advanced/`](./advanced) | Full applicable App Percy SDK feature surface: orientation, ignore/consider regions (xpath, appium element, custom bbox), fullscreen + status/nav bar heights, sync mode, test_case + labels. JUnit 5 + Map<String,Object> options overload. See [`advanced/README.md`](./advanced/README.md). | `cd advanced && make test` |
+
 ## Java Appium Tutorial
 
 The tutorial assumes you're already familiar with Java and
