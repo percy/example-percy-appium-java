@@ -11,6 +11,7 @@ import io.appium.java_client.MobileBy;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.AndroidElement;
 import io.percy.appium.AppPercy;
+import org.json.JSONObject;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -22,6 +23,8 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class AdvancedTest {
   private static final String HUB_URL = "https://hub-cloud.browserstack.com/wd/hub";
@@ -36,8 +39,8 @@ public class AdvancedTest {
     caps.setCapability("app", System.getenv("APP"));
     caps.setCapability("device", System.getenv().getOrDefault("DEVICE", "Google Pixel 6"));
     caps.setCapability("os_version", System.getenv().getOrDefault("OS_VERSION", "12.0"));
-    caps.setCapability("project", System.getenv().getOrDefault("PERCY_PROJECT", "Percy Appium Java Advanced"));
-    caps.setCapability("build", System.getenv().getOrDefault("PERCY_BUILD", "Advanced Java Appium"));
+    caps.setCapability("project", System.getenv().getOrDefault("BROWSERSTACK_PROJECT_NAME", "Percy Appium Java Advanced"));
+    caps.setCapability("build", System.getenv().getOrDefault("BROWSERSTACK_BUILD_NAME", "Advanced Java Appium"));
     caps.setCapability("percy.enabled", "true");
     caps.setCapability("percy.ignoreErrors", "true");
 
@@ -114,7 +117,11 @@ public class AdvancedTest {
   void exercisesSyncMode() {
     Map<String, Object> opts = new HashMap<>();
     opts.put("sync", true);
-    percy.screenshot("Wikipedia Home — sync", opts);
+    // sync blocks until Percy returns the snapshot comparison result, so the
+    // SDK hands back a non-null JSONObject (unlike the fire-and-forget async path).
+    JSONObject result = percy.screenshot("Wikipedia Home — sync", opts);
+    System.out.println("[advanced] sync comparison result: " + result);
+    assertNotNull(result, "sync screenshot should return the comparison result");
   }
 
   @Test

@@ -47,7 +47,7 @@ rows:
 
   - id: build_metadata_via_env
     state: covered
-    test: 'AdvancedTest @BeforeAll capabilities driven by env (PERCY_PROJECT, PERCY_BUILD, DEVICE, OS_VERSION, APP)'
+    test: 'AdvancedTest @BeforeAll capabilities driven by env (BROWSERSTACK_PROJECT_NAME, BROWSERSTACK_BUILD_NAME, DEVICE, OS_VERSION, APP)'
   - id: env_percy_branch
     state: covered
     test: 'CI advanced job sets PERCY_BRANCH via env'
