@@ -4,7 +4,7 @@ This directory exercises the full applicable Percy SDK feature surface for `io.p
 
 ## What this example covers
 
-A JUnit 5 suite (`src/test/java/io/percy/examplepercyappiumjava/advanced/AdvancedTest.java`) where each `@Test` exercises one row of the [App Percy / Appium Native matrix](../../../docs/advanced-example-feature-matrix.md): device_name override, orientation, fullscreen + status_bar_height + nav_bar_height, ignore regions via xpath / appium element / custom bounding box, consider regions via xpath, sync mode, test_case + labels, build metadata via env, PERCY_BRANCH / PERCY_COMMIT override.
+A JUnit 5 suite (`src/test/java/io/percy/examplepercyappiumjava/advanced/AdvancedTest.java`) where each `@Test` exercises one row of the App Percy / Appium Native matrix (source of truth: [`matrix.yml`](./matrix.yml)): device_name override, orientation, fullscreen + status_bar_height + nav_bar_height, ignore regions via xpath / appium element / custom bounding box, consider regions via xpath, sync mode, test_case + labels, build metadata via env, PERCY_BRANCH / PERCY_COMMIT override.
 
 Web-only options (widths, percyCSS, minHeight, scope, discovery, domTransformation, responsiveSnapshotCapture, readiness preset, devicePixelRatio, browsers) marked `N/A` in `matrix.yml` — there's no DOM in native App Percy.
 
