@@ -71,7 +71,18 @@ public class AdvancedTest {
 
   @AfterAll
   static void tearDown() {
-    if (driver != null) driver.quit();
+    // A long-running session (the full-page scroll-and-stitch + the sync
+    // comparison wait can idle the appium connection) may already have been
+    // reclaimed by the hub by the time we tear down. quit() on an
+    // already-terminated session throws; swallow it so cleanup never fails the
+    // build — the snapshots are already uploaded by this point.
+    if (driver != null) {
+      try {
+        driver.quit();
+      } catch (Exception e) {
+        System.out.println("[advanced] driver.quit() ignored (session already ended): " + e.getMessage());
+      }
+    }
   }
 
   @Test
@@ -101,6 +112,24 @@ public class AdvancedTest {
     opts.setStatusBarHeight(24);
     opts.setNavBarHeight(0);
     percy.screenshot("Wikipedia Home — fullscreen", opts);
+  }
+
+  @Test
+  void exercisesFullpageWithBottomScrollOffset() {
+    // Full-page (scroll-and-stitch) capture — App Automate only. The device's
+    // bottom navigation/system bar is sticky, so the scroll engine treats it
+    // as the end of the page and grabs a single tile. Ignoring the bottom
+    // BottomScrollviewOffset pixels lets the scroll advance past the fixed bar
+    // and stitch the real content. Verified on Pixel 6: without the offset =
+    // 1 tile, with offset = ~7 tiles. Default = Pixel 6 nav-bar height (160
+    // device px); override via BOTTOM_SCROLLVIEW_OFFSET.
+    int bottomOffset = Integer.parseInt(
+        System.getenv().getOrDefault("BOTTOM_SCROLLVIEW_OFFSET", "160"));
+    ScreenshotOptions opts = new ScreenshotOptions();
+    opts.setFullPage(true);
+    opts.setScreenLengths(4);
+    opts.setBottomScrollviewOffset(bottomOffset);
+    percy.screenshot("Wikipedia Home — fullpage", opts);
   }
 
   @Test
