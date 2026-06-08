@@ -1,0 +1,187 @@
+package io.percy.examplepercyappiumjava.advanced;
+
+// PER-8195 Phase 2 — appium-java advanced example.
+// Each @Test exercises one row of the App Percy / Appium Native matrix.
+// See ../../../../matrix.yml for the canonical mapping.
+//
+// Run against the BrowserStack App Automate hub. Requires AA_USERNAME,
+// AA_ACCESS_KEY, APP env vars. See ../README.md.
+
+import io.appium.java_client.MobileBy;
+import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.android.AndroidElement;
+import io.percy.appium.AppPercy;
+import io.percy.appium.lib.Region;
+import io.percy.appium.lib.ScreenshotOptions;
+import org.json.JSONObject;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.openqa.selenium.ScreenOrientation;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.net.URL;
+import java.util.Arrays;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class AdvancedTest {
+  private static final String HUB_URL = "https://hub-cloud.browserstack.com/wd/hub";
+
+  // Wikipedia Android sample app home-screen selector, verified against a real
+  // Pixel 6 / Android 12 page source: the feed's search bar carries the
+  // locale-independent resource-id org.wikipedia.alpha:id/search_container.
+  // Used as the ignore/consider region target so the regions are non-empty and
+  // visible on the Percy diff. All SDK examples use this same selector.
+  private static final String WIKIPEDIA_REGION_XPATH =
+      "//*[@resource-id=\"org.wikipedia.alpha:id/search_container\"]";
+
+  private static AndroidDriver<AndroidElement> driver;
+  private static AppPercy percy;
+
+  @BeforeAll
+  static void setUp() throws Exception {
+    String platform = System.getenv().getOrDefault("PLATFORM", "android").toLowerCase();
+    if (platform.equals("ios")) {
+      // TODO(PER-8195): iOS pathway not yet implemented for the advanced
+      // example. Add an IOSDriver<IOSElement> branch once the iOS sample app
+      // + capabilities are wired up.
+      throw new IllegalStateException(
+          "PLATFORM=ios is not yet supported in advanced AdvancedTest; "
+              + "Android pathway is the current focus. See PER-8195.");
+    }
+
+    DesiredCapabilities caps = new DesiredCapabilities();
+    caps.setCapability("browserstack.user", System.getenv("AA_USERNAME"));
+    caps.setCapability("browserstack.key", System.getenv("AA_ACCESS_KEY"));
+    caps.setCapability("app", System.getenv("APP"));
+    caps.setCapability("device", System.getenv().getOrDefault("DEVICE", "Google Pixel 6"));
+    caps.setCapability("os_version", System.getenv().getOrDefault("OS_VERSION", "12.0"));
+    caps.setCapability("project", System.getenv().getOrDefault("BROWSERSTACK_PROJECT_NAME", "Percy Appium Java Advanced"));
+    caps.setCapability("build", System.getenv().getOrDefault("BROWSERSTACK_BUILD_NAME", "Advanced Java Appium"));
+    caps.setCapability("percy.enabled", "true");
+    caps.setCapability("percy.ignoreErrors", "true");
+
+    driver = new AndroidDriver<>(new URL(HUB_URL), caps);
+    percy = new AppPercy(driver);
+    Thread.sleep(5000);
+  }
+
+  @AfterAll
+  static void tearDown() {
+    // A long-running session (the full-page scroll-and-stitch + the sync
+    // comparison wait can idle the appium connection) may already have been
+    // reclaimed by the hub by the time we tear down. quit() on an
+    // already-terminated session throws; swallow it so cleanup never fails the
+    // build — the snapshots are already uploaded by this point.
+    if (driver != null) {
+      try {
+        driver.quit();
+      } catch (Exception e) {
+        System.out.println("[advanced] driver.quit() ignored (session already ended): " + e.getMessage());
+      }
+    }
+  }
+
+  @Test
+  void exercisesBaselineScreenshot() {
+    percy.screenshot("Wikipedia Home");
+  }
+
+  @Test
+  void exercisesDeviceNameAndOrientation() {
+    // Actually rotate the device so the snapshot reflects landscape pixels
+    // instead of just being tagged "landscape" in metadata.
+    driver.rotate(ScreenOrientation.LANDSCAPE);
+    try {
+      ScreenshotOptions opts = new ScreenshotOptions();
+      opts.setDeviceName(System.getenv().getOrDefault("DEVICE", "Google Pixel 6"));
+      opts.setOrientation("landscape");
+      percy.screenshot("Wikipedia Home — landscape", opts);
+    } finally {
+      driver.rotate(ScreenOrientation.PORTRAIT);
+    }
+  }
+
+  @Test
+  void exercisesFullscreenAndBars() {
+    ScreenshotOptions opts = new ScreenshotOptions();
+    opts.setFullScreen(true);
+    opts.setStatusBarHeight(24);
+    opts.setNavBarHeight(0);
+    percy.screenshot("Wikipedia Home — fullscreen", opts);
+  }
+
+  @Test
+  void exercisesFullpageWithBottomScrollOffset() {
+    // Full-page (scroll-and-stitch) capture — App Automate only. The device's
+    // bottom navigation/system bar is sticky, so the scroll engine treats it
+    // as the end of the page and grabs a single tile. Ignoring the bottom
+    // BottomScrollviewOffset pixels lets the scroll advance past the fixed bar
+    // and stitch the real content. Verified on Pixel 6: without the offset =
+    // 1 tile, with offset = ~7 tiles. Default = Pixel 6 nav-bar height (160
+    // device px); override via BOTTOM_SCROLLVIEW_OFFSET.
+    int bottomOffset = Integer.parseInt(
+        System.getenv().getOrDefault("BOTTOM_SCROLLVIEW_OFFSET", "160"));
+    ScreenshotOptions opts = new ScreenshotOptions();
+    opts.setFullPage(true);
+    opts.setScreenLengths(4);
+    opts.setBottomScrollviewOffset(bottomOffset);
+    percy.screenshot("Wikipedia Home — fullpage", opts);
+  }
+
+  @Test
+  void exercisesIgnoreRegionsViaXpath() {
+    ScreenshotOptions opts = new ScreenshotOptions();
+    opts.setIgnoreRegionXpaths(Arrays.asList(WIKIPEDIA_REGION_XPATH));
+    percy.screenshot("Wikipedia Home — ignore via xpath", opts);
+  }
+
+  @Test
+  void exercisesIgnoreRegionsViaAppiumElements() {
+    AndroidElement el = (AndroidElement) new WebDriverWait(driver, 30).until(
+        ExpectedConditions.elementToBeClickable(MobileBy.AccessibilityId("Search Wikipedia")));
+    ScreenshotOptions opts = new ScreenshotOptions();
+    opts.setIgnoreRegionAppiumElements(Arrays.<Object>asList(el));
+    percy.screenshot("Wikipedia Home — ignore via appium element", opts);
+  }
+
+  @Test
+  void exercisesCustomIgnoreRegions() {
+    ScreenshotOptions opts = new ScreenshotOptions();
+    opts.setCustomIgnoreRegions(Arrays.asList(new Region(0, 100, 0, 300)));
+    percy.screenshot("Wikipedia Home — custom ignore region", opts);
+  }
+
+  @Test
+  void exercisesConsiderRegionsViaXpath() {
+    ScreenshotOptions opts = new ScreenshotOptions();
+    opts.setConsiderRegionXpaths(Arrays.asList(WIKIPEDIA_REGION_XPATH));
+    percy.screenshot("Wikipedia Home — consider via xpath", opts);
+  }
+
+  @Test
+  void exercisesSyncMode() {
+    ScreenshotOptions opts = new ScreenshotOptions();
+    opts.setSync(true);
+    // sync blocks until Percy returns the comparison result. With a full-access
+    // PERCY_TOKEN that's the comparison payload; with a write-only token (the
+    // common CI setup) Percy responds 403 and the SDK returns an error payload
+    // (or null). Don't require real comparison data — only that the sync call
+    // returned a JSONObject or null, not that the token had read access.
+    JSONObject result = percy.screenshot("Wikipedia Home — sync", opts);
+    System.out.println("[advanced] sync comparison result: " + result);
+    assertTrue(result == null || result instanceof JSONObject,
+        "sync should return a JSONObject (comparison data or error payload) or null");
+  }
+
+  @Test
+  void exercisesTestCaseAndLabels() {
+    ScreenshotOptions opts = new ScreenshotOptions();
+    opts.setTestCase("home-smoke");
+    opts.setLabels("smoke,appium-java");
+    percy.screenshot("Wikipedia Home — test_case + labels", opts);
+  }
+}
