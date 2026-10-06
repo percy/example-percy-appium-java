@@ -7,9 +7,8 @@ package io.percy.examplepercyappiumjava.advanced;
 // Run against the BrowserStack App Automate hub. Requires AA_USERNAME,
 // AA_ACCESS_KEY, APP env vars. See ../README.md.
 
-import io.appium.java_client.MobileBy;
+import io.appium.java_client.AppiumBy;
 import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.android.AndroidElement;
 import io.percy.appium.AppPercy;
 import io.percy.appium.lib.Region;
 import io.percy.appium.lib.ScreenshotOptions;
@@ -18,12 +17,16 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.ScreenOrientation;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.net.URL;
+import java.time.Duration;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -38,7 +41,7 @@ public class AdvancedTest {
   private static final String WIKIPEDIA_REGION_XPATH =
       "//*[@resource-id=\"org.wikipedia.alpha:id/search_container\"]";
 
-  private static AndroidDriver<AndroidElement> driver;
+  private static AndroidDriver driver;
   private static AppPercy percy;
 
   @BeforeAll
@@ -46,25 +49,33 @@ public class AdvancedTest {
     String platform = System.getenv().getOrDefault("PLATFORM", "android").toLowerCase();
     if (platform.equals("ios")) {
       // TODO(PER-8195): iOS pathway not yet implemented for the advanced
-      // example. Add an IOSDriver<IOSElement> branch once the iOS sample app
+      // example. Add an IOSDriver branch once the iOS sample app
       // + capabilities are wired up.
       throw new IllegalStateException(
           "PLATFORM=ios is not yet supported in advanced AdvancedTest; "
               + "Android pathway is the current focus. See PER-8195.");
     }
 
-    DesiredCapabilities caps = new DesiredCapabilities();
-    caps.setCapability("browserstack.user", System.getenv("AA_USERNAME"));
-    caps.setCapability("browserstack.key", System.getenv("AA_ACCESS_KEY"));
-    caps.setCapability("app", System.getenv("APP"));
-    caps.setCapability("device", System.getenv().getOrDefault("DEVICE", "Google Pixel 6"));
-    caps.setCapability("os_version", System.getenv().getOrDefault("OS_VERSION", "12.0"));
-    caps.setCapability("project", System.getenv().getOrDefault("BROWSERSTACK_PROJECT_NAME", "Percy Appium Java Advanced"));
-    caps.setCapability("build", System.getenv().getOrDefault("BROWSERSTACK_BUILD_NAME", "Advanced Java Appium"));
-    caps.setCapability("percy.enabled", "true");
-    caps.setCapability("percy.ignoreErrors", "true");
+    Map<String, Object> bstackOptions = new HashMap<>();
+    bstackOptions.put("userName", System.getenv("AA_USERNAME"));
+    bstackOptions.put("accessKey", System.getenv("AA_ACCESS_KEY"));
+    bstackOptions.put("appiumVersion", System.getenv().getOrDefault("APPIUM_VERSION", "2.19.0"));
+    bstackOptions.put("deviceName", System.getenv().getOrDefault("DEVICE", "Google Pixel 6"));
+    bstackOptions.put("osVersion", System.getenv().getOrDefault("OS_VERSION", "12.0"));
+    bstackOptions.put("projectName", System.getenv().getOrDefault("BROWSERSTACK_PROJECT_NAME", "Percy Appium Java Advanced"));
+    bstackOptions.put("buildName", System.getenv().getOrDefault("BROWSERSTACK_BUILD_NAME", "Advanced Java Appium"));
 
-    driver = new AndroidDriver<>(new URL(HUB_URL), caps);
+    Map<String, Object> percyOptions = new HashMap<>();
+    percyOptions.put("enabled", true);
+    percyOptions.put("ignoreErrors", true);
+
+    DesiredCapabilities caps = new DesiredCapabilities();
+    caps.setCapability("platformName", "Android");
+    caps.setCapability("appium:app", System.getenv("APP"));
+    caps.setCapability("appium:percyOptions", percyOptions);
+    caps.setCapability("bstack:options", bstackOptions);
+
+    driver = new AndroidDriver(new URL(HUB_URL), caps);
     percy = new AppPercy(driver);
     Thread.sleep(5000);
   }
@@ -141,8 +152,8 @@ public class AdvancedTest {
 
   @Test
   void exercisesIgnoreRegionsViaAppiumElements() {
-    AndroidElement el = (AndroidElement) new WebDriverWait(driver, 30).until(
-        ExpectedConditions.elementToBeClickable(MobileBy.AccessibilityId("Search Wikipedia")));
+    WebElement el = new WebDriverWait(driver, Duration.ofSeconds(30)).until(
+        ExpectedConditions.elementToBeClickable(AppiumBy.accessibilityId("Search Wikipedia")));
     ScreenshotOptions opts = new ScreenshotOptions();
     opts.setIgnoreRegionAppiumElements(Arrays.<Object>asList(el));
     percy.screenshot("Wikipedia Home — ignore via appium element", opts);
