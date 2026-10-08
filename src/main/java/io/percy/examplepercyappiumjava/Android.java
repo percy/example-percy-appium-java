@@ -2,16 +2,18 @@ package io.percy.examplepercyappiumjava;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.Duration;
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import io.appium.java_client.MobileBy;
+import io.appium.java_client.AppiumBy;
 
 import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.android.AndroidElement;
 
 import io.percy.appium.AppPercy;
 
@@ -29,24 +31,30 @@ public class Android {
         String USERNAME = System.getenv("BROWSERSTACK_USERNAME");
         String AUTOMATE_KEY =  System.getenv("BROWSERSTACK_ACCESS_KEY");
         String APP_URL=  System.getenv("APP_URL");
-        DesiredCapabilities capabilities = new DesiredCapabilities();
         // Browserstack specific capabiilities
-        capabilities.setCapability("browserstack.user", USERNAME);
-        capabilities.setCapability("browserstack.key", AUTOMATE_KEY);
-        capabilities.setCapability("browserstack.appium_version", "1.20.2");
+        HashMap<String, Object> browserstackOptions = new HashMap<>();
+        browserstackOptions.put("userName", USERNAME);
+        browserstackOptions.put("accessKey", AUTOMATE_KEY);
+        browserstackOptions.put("appiumVersion",
+            System.getenv().getOrDefault("APPIUM_VERSION", "2.19.0"));
+        browserstackOptions.put("deviceName", "Samsung Galaxy S21");
+        browserstackOptions.put("osVersion", "11.0");
+        browserstackOptions.put("projectName", "First Java Project");
 
         // Percy Options
-        capabilities.setCapability("percy.enabled", "true");
-        capabilities.setCapability("percy.ignoreErrors", "true");
+        HashMap<String, Object> percyOptions = new HashMap<>();
+        percyOptions.put("enabled", true);
+        percyOptions.put("ignoreErrors", true);
 
+        DesiredCapabilities capabilities = new DesiredCapabilities();
+        capabilities.setCapability("platformName", "Android");
         // App url we get post uploading in response
-        capabilities.setCapability("app", APP_URL);
-        capabilities.setCapability("device", "Samsung Galaxy S21");
-        capabilities.setCapability("os_version", "11.0");
-        capabilities.setCapability("project", "First Java Project");
+        capabilities.setCapability("appium:app", APP_URL);
+        capabilities.setCapability("appium:percyOptions", percyOptions);
+        capabilities.setCapability("bstack:options", browserstackOptions);
 
         // Create sessioin
-        AndroidDriver<AndroidElement> driver = new AndroidDriver<AndroidElement>(new URL(HUB_URL), capabilities);
+        AndroidDriver driver = new AndroidDriver(new URL(HUB_URL), capabilities);
 
         // Initialize AppPercy
         percy = new AppPercy(driver);
@@ -60,12 +68,12 @@ public class Android {
         percy.screenshot("First Screenshot");
 
 
-        AndroidElement searchElement = (AndroidElement) new WebDriverWait(driver, 30).until(
-            ExpectedConditions.elementToBeClickable(MobileBy.AccessibilityId("Search Wikipedia")));
+        WebElement searchElement = new WebDriverWait(driver, Duration.ofSeconds(30)).until(
+            ExpectedConditions.elementToBeClickable(AppiumBy.accessibilityId("Search Wikipedia")));
         searchElement.click();
 
-        AndroidElement textInput = (AndroidElement) new WebDriverWait(driver, 30).until(
-            ExpectedConditions.elementToBeClickable(MobileBy.id("org.wikipedia.alpha:id/search_src_text")));
+        WebElement textInput = new WebDriverWait(driver, Duration.ofSeconds(30)).until(
+            ExpectedConditions.elementToBeClickable(AppiumBy.id("org.wikipedia.alpha:id/search_src_text")));
         textInput.sendKeys("Browserstack\n");
 
         try {
