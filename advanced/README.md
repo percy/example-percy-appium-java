@@ -19,6 +19,7 @@ export AA_USERNAME="<browserstack username>"
 export AA_ACCESS_KEY="<browserstack access key>"
 export APP="bs://<your hashed app id>"
 export PERCY_TOKEN="<your project token>"      # do NOT commit this
+export APPIUM_VERSION="2.19.0"                 # optional; BrowserStack appiumVersion
 make test
 ```
 
